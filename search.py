@@ -12,7 +12,7 @@ def main():
 
 def mnist():
     mnist_train, mnist_val, mnist_test = dataset.read_mnist_data('.')
-    dataset.display_mnist(mnist_train[:20])
+    dataset.display_mnist(mnist_train[:200])
     best_std_dev, best_log_probs = find_optimal_value(mnist_train[0:10], mnist_val[0:10])
     print("Best std dev: " + str(best_std_dev) + " achieved with a mean log probability of: " + str(best_log_probs))
     t0 = time.time()
@@ -25,8 +25,9 @@ def mnist():
 
 def cifar100():
     cifar100_train, cifar100_val, cifar100_test = dataset.read_cifar100('cifar-100-python')
-    dataset.display_cifar100(cifar100_train[:20])
-    best_std_dev = find_optimal_value(cifar100_train[0:10], cifar100_val[0:10])
+    dataset.display_cifar100(cifar100_train[:200])
+    best_std_dev, best_log_probs = find_optimal_value(cifar100_train[0:10], cifar100_val[0:10])
+    print("Best std dev: " + str(best_std_dev) + " achieved with a mean log probability of: " + str(best_log_probs))
     t0 = time.time()
     mean_log_prob = kde_mg.mean_log_prob(cifar100_train[0:100], cifar100_test[0:100], best_std_dev)
     total_time = time.time() - t0

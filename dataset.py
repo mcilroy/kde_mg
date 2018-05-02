@@ -12,9 +12,7 @@ which is GPL licensed.
 
 def read(dataset="training", path="."):
     """
-    Python function for importing the MNIST data set.  It returns an iterator
-    of 2-tuples with the first element being the label and the second element
-    being a numpy.uint8 2D array of pixel data for the given image.
+    Python function for importing the MNIST data set.
     """
 
     if dataset is "training":
@@ -38,23 +36,18 @@ def read(dataset="training", path="."):
 
 
 def display_mnist(images):
-    images = np.reshape(images, [-1, 28, 28])
+    width = 28
+    height = 28
+    images = np.reshape(images, [-1, height, width])
     rows = int(math.sqrt(images.shape[0]))
-    columns = int(math.sqrt(images.shape[1]))
-    # single_img = np.zeros((rows*28, columns*28))
-    # for i in range(rows):
-    #     for j in range(columns):
-    #         single_img[i:(i+1)*28, i:(i+1)*28] =
-    images = np.reshape(images, [rows*28, columns*28])
-    plt.imshow(images, cmap='gray')
-    plt.show()
-    fig, ax = plt.subplots(nrows=rows, ncols=columns, sharex=True, sharey=True)
+    columns = int(math.sqrt(images.shape[0]))
+    single_img = np.zeros((rows*height, columns*width))
     count = 0
-    for row in range(rows):
-        for col in range(columns):
-            ax[row, col].imshow(images[count], cmap='gray')
+    for i in range(rows):
+        for j in range(columns):
+            single_img[i*height:(i+1)*height, j*width:(j+1)*width] = images[count]
             count += 1
-    plt.tight_layout()
+    plt.imshow(single_img, cmap='gray')
     plt.show()
 
 
@@ -71,39 +64,39 @@ def read_mnist_data(path):
 
 
 def read_cifar100(path):
-    train_dict = unpickle(os.path.join(path, 'train'))
-    test_dict = unpickle(os.path.join(path, 'test'))
-    all_train_images = train_dict[b'data']
-    test_images = test_dict[b'data']
+    all_train_images = unpickle_data(os.path.join(path, 'train'))
+    test_images = unpickle_data(os.path.join(path, 'test'))
     perm_idx = np.random.permutation(all_train_images.shape[0])
     all_train_images = all_train_images[perm_idx]
     all_train_images = all_train_images[0:20000]
     train_images = all_train_images[0:10000]
     train_images = train_images.astype('float32') / 255
     val_images = all_train_images[10000:20000]
+    all_train_images = None  # prevent memory errors for my laptop
     val_images = val_images.astype('float32') / 255
     test_images = test_images.astype('float32') / 255
     return train_images, val_images, test_images
 
 
-def unpickle(file):
+def unpickle_data(file):
     import pickle
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
-    return dict
+    return dict[b'data']
 
 
 def display_cifar100(images):
-    images = np.reshape(images, [-1, 3, 32, 32])
+    width = 32
+    height = 32
+    images = np.reshape(images, [-1, 3, height, width])
     images = np.transpose(images, (0, 2, 3, 1))
     rows = int(math.sqrt(images.shape[0]))
-    columns = int(math.sqrt(images.shape[1]))
-    fig, ax = plt.subplots(nrows=rows, ncols=columns, sharex=True, sharey=True)
+    columns = int(math.sqrt(images.shape[0]))
+    single_img = np.zeros((rows * height, columns * width, 3))
     count = 0
-    for row in range(rows):
-        for col in range(columns):
-            ax[row, col].imshow(images[count])
+    for i in range(rows):
+        for j in range(columns):
+            single_img[i*height:(i+1)*height, j*width:(j+1)*width, :] = images[count]
             count += 1
-    plt.tight_layout()
+    plt.imshow(single_img)
     plt.show()
-
