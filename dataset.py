@@ -4,10 +4,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-"""
-Loosely inspired by http://abel.ee.ucla.edu/cvxopt/_downloads/mnist.py
-which is GPL licensed.
-"""
+
+def read_mnist_data(path):
+    """ Read MNIST images from file path. Shuffle data. Select 10K for train, 10K for val.
+        10K for test from test file. Convert to float32 and scale to 0-1. """
+    all_train_images = read("training", path)
+    perm_idx = np.random.permutation(all_train_images.shape[0])
+    all_train_images = all_train_images[perm_idx]
+    all_train_images = all_train_images.astype('float32') / 255
+    train_images = all_train_images[0:10000]
+    val_images = all_train_images[10000:20000]
+    test_images = read("testing")
+    test_images = test_images.astype('float32') / 255
+    return train_images, val_images, test_images
 
 
 def read(dataset="training", path="."):
@@ -16,23 +25,17 @@ def read(dataset="training", path="."):
     """
 
     if dataset is "training":
-        fname_img = os.path.join(path, 'train-images.idx3-ubyte')
-        fname_lbl = os.path.join(path, 'train-labels.idx1-ubyte')
+        fname_img = os.path.join(path, 'train-images-idx3-ubyte')
     elif dataset is "testing":
-        fname_img = os.path.join(path, 't10k-images.idx3-ubyte')
-        fname_lbl = os.path.join(path, 't10k-labels.idx1-ubyte')
+        fname_img = os.path.join(path, 't10k-images-idx3-ubyte')
     else:
         raise ValueError("dataset must be 'testing' or 'training'")
 
-    # Load everything in some numpy arrays
-    with open(fname_lbl, 'rb') as flbl:
-        magic, num = struct.unpack(">II", flbl.read(8))
-        lbl = np.fromfile(flbl, dtype=np.int8)
-
     with open(fname_img, 'rb') as fimg:
         magic, num, rows, cols = struct.unpack(">IIII", fimg.read(16))
-        img = np.fromfile(fimg, dtype=np.uint8).reshape(len(lbl), rows*cols)
-    return img, lbl
+        img = np.fromfile(fimg, dtype=np.uint8)
+        img = np.reshape(img, [-1, rows*cols])
+    return img
 
 
 def display_mnist(images):
@@ -50,20 +53,6 @@ def display_mnist(images):
             count += 1
     plt.imshow(single_img, cmap='gray')
     plt.savefig('mnist_sample.png')
-
-
-def read_mnist_data(path):
-    """ Read MNIST images from file path. Shuffle data. Select 10K for train, 10K for val. 
-        10K for test from test file. Convert to float32 and scale to 0-1. """
-    all_train_images, train_labels = read("training", path)
-    perm_idx = np.random.permutation(all_train_images.shape[0])
-    all_train_images = all_train_images[perm_idx]
-    all_train_images = all_train_images.astype('float32') / 255
-    train_images = all_train_images[0:10000]
-    val_images = all_train_images[10000:20000]
-    test_images, test_labels = read("testing")
-    test_images = test_images.astype('float32') / 255
-    return train_images, val_images, test_images
 
 
 def read_cifar100(path):

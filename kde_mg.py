@@ -25,7 +25,7 @@ def mean_log_prob(data_a, data_b, std_dev):
     return summ_m/data_b.shape[0]
 
 
-def mean_log_prob3(data_a, data_b, std_dev):
+def mean_log_prob_tiling(data_a, data_b, std_dev):
     """ calculates mean log probability of data_b on data_a
     use numerical stability trick for log(exp(a)+exp(b))
     to speed up the summations data_b is duplicated and data_a is subtracted from it.

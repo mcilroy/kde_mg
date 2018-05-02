@@ -24,10 +24,10 @@ def mnist():
     Benchmarked running time."""
     mnist_train, mnist_val, mnist_test = dataset.read_mnist_data('.')
     dataset.display_mnist(mnist_train[:200])
-    best_std_dev, best_log_probs = find_optimal_value(mnist_train[:10], mnist_val[:10], "mnist")
+    best_std_dev, best_log_probs = find_optimal_value(mnist_train, mnist_val, "mnist")
     print("Best std dev: " + str(best_std_dev) + " achieved with a mean log probability of: " + str(best_log_probs))
     t0 = time.time()
-    mean_log_prob = kde_mg.mean_log_prob3(mnist_train, mnist_test[:200], best_std_dev)
+    mean_log_prob = kde_mg.mean_log_prob_tiling(mnist_train, mnist_test, best_std_dev)
     total_time = time.time() - t0
     print("Calculating mean log probability of test mnist dataset...")
     print("Running time: " + str(total_time) + " seconds")
@@ -39,10 +39,10 @@ def cifar100():
     dataset. Benchmarked running time."""
     cifar100_train, cifar100_val, cifar100_test = dataset.read_cifar100('cifar-100-python')
     dataset.display_cifar100(cifar100_train[:200])
-    best_std_dev, best_log_probs = find_optimal_value(cifar100_train[:10], cifar100_val[:10], "cifar100")
+    best_std_dev, best_log_probs = find_optimal_value(cifar100_train, cifar100_val, "cifar100")
     print("Best std dev: " + str(best_std_dev) + " achieved with a mean log probability of: " + str(best_log_probs))
     t0 = time.time()
-    mean_log_prob = kde_mg.mean_log_prob(cifar100_train[:10], cifar100_test, best_std_dev)
+    mean_log_prob = kde_mg.mean_log_prob_tiling(cifar100_train, cifar100_test, best_std_dev)
     total_time = time.time() - t0
     print("Calculating mean log probability of test CIFAR100 dataset...")
     print("Running time: " + str(total_time) + " seconds")
@@ -57,7 +57,7 @@ def find_optimal_value(train, val, dataset_name):
     for i, std_dev in enumerate(std_devs):
         mean_log_prob = kde_mg.mean_log_prob(train, val, std_dev)
         mean_log_probs.append(mean_log_prob)
-        print(i)
+        print(dataset_name + " - finding optimal value % complete: " + str((float(i)/len(std_devs))*100))
     visualization_of_optimal_value(std_devs, mean_log_probs, dataset_name)
     best_log_probs = np.amax(mean_log_probs)
     best_std_dev = std_devs[np.argmax(mean_log_probs)]
@@ -74,5 +74,4 @@ def visualization_of_optimal_value(std_devs, mean_log_probs, dataset_name):
 
 
 if __name__ == "__main__":
-    np.random.seed(1)
     main()
