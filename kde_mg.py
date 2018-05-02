@@ -21,7 +21,7 @@ def mean_log_prob(data_a, data_b, std_dev):
         summ_m += lg_prob
 
         if i % 1000 == 0:
-            print(i)
+            print("i: " + str(i))
     return summ_m/data_b.shape[0]
 
 
@@ -35,8 +35,6 @@ def mean_log_prob3(data_a, data_b, std_dev):
     pi_stddev_2 = np.log(2 * np.pi * np.power(std_dev, 2)) / 2
     summ_m = 0.0
     for i in range(data_b.shape[0]):
-        #duplicated_data_b = np.repeat(data_b[i], data_a.shape[0])
-        #duplicated_data_b = np.reshape(duplicated_data_b, data_a.shape)
         duplicated_data_b = np.tile(data_b[i], (data_a.shape[0], 1))
         p_x_z = (np.power(duplicated_data_b - data_a, 2) / std_2) - pi_stddev_2
         summ_k = log_k + p_x_z.sum(axis=1)
@@ -45,8 +43,6 @@ def mean_log_prob3(data_a, data_b, std_dev):
         summ_k = np.exp(summ_k)
         lg_prob = np.log(summ_k.sum()) + m
         summ_m += lg_prob
-
-        #summ_m += np.log(np.exp(summ_k).sum())
 
         if i % 1000 == 0:
             print("i: " + str(i))

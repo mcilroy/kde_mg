@@ -12,7 +12,7 @@ which is GPL licensed.
 
 def read(dataset="training", path="."):
     """
-    Python function for importing the MNIST data set.
+    Python function for importing the MNIST data set. Inspired from https://gist.github.com/akesling/5358964
     """
 
     if dataset is "training":
@@ -36,6 +36,7 @@ def read(dataset="training", path="."):
 
 
 def display_mnist(images):
+    """ Concatenate a series of images into a single image grid. Save image."""
     width = 28
     height = 28
     images = np.reshape(images, [-1, height, width])
@@ -48,22 +49,26 @@ def display_mnist(images):
             single_img[i*height:(i+1)*height, j*width:(j+1)*width] = images[count]
             count += 1
     plt.imshow(single_img, cmap='gray')
-    plt.show()
+    plt.savefig('mnist_sample.png')
 
 
 def read_mnist_data(path):
+    """ Read MNIST images from file path. Shuffle data. Select 10K for train, 10K for val. 
+        10K for test from test file. Convert to float32 and scale to 0-1. """
     all_train_images, train_labels = read("training", path)
     perm_idx = np.random.permutation(all_train_images.shape[0])
     all_train_images = all_train_images[perm_idx]
-    all_train_images = all_train_images / 255
+    all_train_images = all_train_images.astype('float32') / 255
     train_images = all_train_images[0:10000]
     val_images = all_train_images[10000:20000]
     test_images, test_labels = read("testing")
-    test_images = test_images / 255
+    test_images = test_images.astype('float32') / 255
     return train_images, val_images, test_images
 
 
 def read_cifar100(path):
+    """ Read CIFAR100 images from file path. Shuffle data. Select 10K for train, 10K for val. 
+    10K for test from test file. Convert to float32 and scale to 0-1. """
     all_train_images = unpickle_data(os.path.join(path, 'train'))
     test_images = unpickle_data(os.path.join(path, 'test'))
     perm_idx = np.random.permutation(all_train_images.shape[0])
@@ -79,6 +84,7 @@ def read_cifar100(path):
 
 
 def unpickle_data(file):
+    """ Load data helper function"""
     import pickle
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
@@ -86,6 +92,7 @@ def unpickle_data(file):
 
 
 def display_cifar100(images):
+    """ Concatenate a series of images into a single image grid. Save image."""
     width = 32
     height = 32
     images = np.reshape(images, [-1, 3, height, width])
@@ -99,4 +106,4 @@ def display_cifar100(images):
             single_img[i*height:(i+1)*height, j*width:(j+1)*width, :] = images[count]
             count += 1
     plt.imshow(single_img)
-    plt.show()
+    plt.savefig('cifar100_sample.png')
