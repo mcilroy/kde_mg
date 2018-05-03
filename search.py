@@ -4,7 +4,6 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-
 """
 The goal of the program is to calculate the mean log probability of a dataset B on dataset A.
 The model is a mixture of gaussians where each gaussian componenet is centered around a data point in A.
@@ -27,7 +26,7 @@ def mnist():
     best_std_dev, best_log_probs = find_optimal_value(mnist_train, mnist_val, "mnist")
     print("Best std dev: " + str(best_std_dev) + " achieved with a mean log probability of: " + str(best_log_probs))
     t0 = time.time()
-    mean_log_prob = kde_mg.mean_log_prob_tiling(mnist_train, mnist_test, best_std_dev)
+    mean_log_prob = kde_mg.mean_log_prob_tiling_multi_proc(mnist_train, mnist_test, best_std_dev)
     total_time = time.time() - t0
     print("Calculating mean log probability of test mnist dataset...")
     print("Running time: " + str(total_time) + " seconds")
@@ -42,7 +41,7 @@ def cifar100():
     best_std_dev, best_log_probs = find_optimal_value(cifar100_train, cifar100_val, "cifar100")
     print("Best std dev: " + str(best_std_dev) + " achieved with a mean log probability of: " + str(best_log_probs))
     t0 = time.time()
-    mean_log_prob = kde_mg.mean_log_prob_tiling(cifar100_train, cifar100_test, best_std_dev)
+    mean_log_prob = kde_mg.mean_log_prob_tiling_multi_proc(cifar100_train, cifar100_test, best_std_dev)
     total_time = time.time() - t0
     print("Calculating mean log probability of test CIFAR100 dataset...")
     print("Running time: " + str(total_time) + " seconds")
@@ -55,7 +54,7 @@ def find_optimal_value(train, val, dataset_name):
     std_devs = [0.05, 0.08, 0.1, 0.2, 0.5, 1.0, 1.5, 2.0]
     mean_log_probs = []
     for i, std_dev in enumerate(std_devs):
-        mean_log_prob = kde_mg.mean_log_prob(train, val, std_dev)
+        mean_log_prob = kde_mg.mean_log_prob_tiling_multi_proc(train, val, std_dev)
         mean_log_probs.append(mean_log_prob)
         print(dataset_name + " - finding optimal value % complete: " + str((float(i)/len(std_devs))*100))
     visualization_of_optimal_value(std_devs, mean_log_probs, dataset_name)
